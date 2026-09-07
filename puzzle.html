@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>puzzle</title>
+    <style>
+      *{margin: 0;
+        padding: 0; 
+        box-sizing: border-box;
+        font-family: 'poppins',sans-serif;}
+
+      body {
+        background: linear-gradient(135deg, #e6cb00, #e8ab00);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+      h1 {
+        color: lab(0% 0 0);
+        margin-bottom: 20px;
+      }
+      .puzzle {
+        background: #271600e1;
+        width: 300px;
+        height: 300px;
+        display:grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 5px;
+        padding: 5px;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      }
+      .tile {
+        background: #f4e81ce0;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .tile:hover {
+        transform:scale(1.05);
+      }
+      .empty {
+        background:transparent;
+        cursor: default;
+      }
+      button {
+        margin: 20px;
+        padding: 12px 14px;
+        border: none;
+        border-radius: 25px;
+        background: linear-gradient(136deg, #af8100, #5c4400);
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 15px 20px rgba(0,0,0,0.2);
+      }
+      .button:hover {
+        transform: scale(1.05);
+      }
+      #menang {
+        margin-top: 15px;
+        font-size: 20px;
+        font-weight: bold;
+        display: none;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1> PUZZLE 3X3 </h1>
+    <div class="puzzle" id="papan"></div>
+    <button onclick="acak()">ACAK ULANG</button>
+    <div id="menang">SELAMAT KAU MENANG</div>
+
+    <script>
+      let papan = document.getElementById('papan');
+      let menang = document.getElementById('menang');
+      let kotak = [1,2,3,4,5,6,7,8,''];
+
+      function gambar() {
+        papan.innerHTML = '';
+        kotak.forEach((angka, i) => {
+          let div = document.createElement('div');
+          div.classList.add('tile');
+          if (angka === '') {
+            div.classList.add('empty');
+          } else {
+            div.textContent = angka;
+            div.onclick = () => geser(i);
+          } 
+          papan.appendChild(div);
+        })
+      }
+      function geser(i) {
+        let kosong = kotak.indexOf('');
+        let baris = Math.floor(i / 3);
+        let kolom = i % 3;
+        let barisKosong = Math.floor(kosong / 3);
+        let kolomKosong = kosong % 3;
+        let bisaGeser = (Math.abs(baris - barisKosong) === 1 && kolom === kolomKosong) ||
+          (Math.abs(kolom - kolomKosong) === 1 && baris === barisKosong);
+
+        if(bisaGeser) {
+          kotak[kosong] = kotak[i];
+          kotak[i] = '';
+          gambar();
+          cekMenang();
+        }
+      }
+      function  acak() {
+        menang.style.display = 'none';
+        do {
+          kotak.sort(() => Math.random() - 0.5);
+        } while (!bisaSelesai());
+        gambar();
+      }
+      function bisaSelesai() {
+        let inversi = 0;
+        let arr = kotak.filter(x => x!== '');
+        
+        for(let i=0; i<arr.length; i++){
+          for(let j=i+1; j<arr.length; j++){
+            if(arr[i] > arr[j]) inversi++;
+          }
+        }
+        return inversi % 2 === 0;
+      }
+
+      function cekMenang() {
+        let jawaban = [1,2,3,4,5,6,7,8,''];
+        if(JSON.stringify(kotak) === JSON.stringify(jawaban)) {
+          menang.style.display = 'block';
+        }
+      }
+      acak();
+    </script>
+  </body>
+</html>
